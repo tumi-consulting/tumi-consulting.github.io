@@ -706,7 +706,6 @@
           ${BUDGET_OPTIONS.map(o => `
             <button class="opt-btn ${state.budget === o.id ? 'selected' : ''}" onclick="selectOpt('budget', '${o.id}', '${o.label}')">
               <span class="opt-title">${o.label}</span>
-              <span class="opt-sub">${o.sub}</span>
             </button>
           `).join("")}
         </div>
@@ -722,7 +721,6 @@
           ${HOUSE_OPTIONS.map(o => `
             <button class="opt-btn ${state.house === o.id ? 'selected' : ''}" onclick="selectOpt('house', '${o.id}', '${o.label}')">
               <span class="opt-title">${o.label}</span>
-              <span class="opt-sub">${o.sub}</span>
             </button>
           `).join("")}
         </div>
