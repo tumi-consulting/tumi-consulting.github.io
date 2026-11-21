@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TUMI | 마케팅 & 리드 데이터 관리자</title>
+  <style>
+    :root {
+      --bg: #F5F3EE;
+      --surface: #FFFFFF;
+      --charcoal: #18181B;
+      --muted: #6B7280;
+      --border: #E5E1D8;
+      --orange: #FF6B00;
+      --orange-soft: #FFF2E8;
+      --green: #059669;
+      --green-soft: #ECFDF5;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", sans-serif;
+      background: var(--bg);
+      color: var(--charcoal);
+      line-height: 1.5;
+    }
+
+    /* Lock Screen */
+    .lock-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .lock-card {
+      width: 100%;
+      max-width: 360px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+    .lock-badge {
+      display: inline-block;
+      background: var(--charcoal);
+      color: #fff;
+      font-weight: 900;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      margin-bottom: 12px;
+    }
+    .lock-card h1 { margin: 0 0 6px; font-size: 20px; font-weight: 800; }
+    .lock-card p { margin: 0 0 20px; font-size: 13px; color: var(--muted); }
+    .pin-input {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      text-align: center;
+      letter-spacing: 0.3em;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    .btn-orange {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: var(--orange);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* Dashboard */
+    .dash { max-width: 1120px; margin: 0 auto; padding: 20px 16px 48px; }
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .title-group h1 { margin: 0; font-size: 22px; font-weight: 900; }
+    .title-group p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+    .top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-sm {
+      padding: 9px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--charcoal);
+    }
+    .btn-sm.active { background: var(--charcoal); color: #fff; border-color: var(--charcoal); }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 18px;
+    }
+    .kpi-label { font-size: 12px; font-weight: 700; color: var(--muted); }
+    .kpi-val { font-size: 26px; font-weight: 900; margin: 6px 0 2px; letter-spacing: -0.02em; }
+    .kpi-sub { font-size: 12px; color: var(--orange); font-weight: 700; }
+
+    /* Panels */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .panel h2 {
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .panel-sub {
+      margin: 0 0 16px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Bar rows */
+    .bar-row { margin-bottom: 11px; }
+    .bar-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .bar-track {
+      width: 100%;
+      height: 10px;
+      background: #EFECE6;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      background: var(--orange);
+      border-radius: 999px;
+    }
+    .bar-fill.dark { background: var(--charcoal); }
+    .bar-fill.green { background: var(--green); }
+
+    /* Hourly Chart */
+    .hour-chart {
+      display: grid;
+      grid-template-columns: repeat(24, 1fr);
+      gap: 4px;
+      align-items: end;
+      height: 120px;
+      padding-top: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .h-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .h-bar {
+      width: 100%;
+      background: #D6D1C7;
+      border-radius: 4px 4px 0 0;
+      min-height: 3px;
+      transition: height 0.2s;
+    }
+    .h-bar.peak { background: var(--orange); }
+    .h-labels {
+      display: grid;
+      grid-template-columns: repeat(24, 1fr);
+      gap: 4px;
+      font-size: 10px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      min-width: 680px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    th { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .b-lead { background: var(--green-soft); color: var(--green); }
+    .b-call { background: var(--orange-soft); color: var(--orange); }
+    .b-view { background: #F3F4F6; color: var(--muted); }
+
+    .insight-box {
+      background: var(--charcoal);
+      color: #fff;
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+    }
+    .insight-box h3 { margin: 0 0 8px; font-size: 15px; color: #FF9E44; }
+    .insight-box ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <!-- Lock Screen -->
+  <div id="lockWrap" class="lock-wrap">
+    <div class="lock-card">
+      <span class="lock-badge">TUMI ADMIN</span>
+      <h1>마케팅 데이터 관리자</h1>
+      <p>투미 대표님 전용 페이지입니다.<br/>비밀번호를 입력해 주세요. (기본 PIN: 4474)</p>
+      <input type="password" id="pinInput" class="pin-input" placeholder="••••" maxlength="6" onkeydown="if(event.key==='Enter') unlock()" />
+      <button class="btn-orange" onclick="unlock()">대시보드 열기</button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashWrap" class="dash hidden">
+    <div class="topbar">
+      <div class="title-group">
+        <h1>📊 투미 매수 진단기 · 마케팅 대시보드</h1>
+        <p id="dataModeDesc">실제 내 브라우저 로그 + 시뮬레이션 샘플 모드</p>
+      </div>
+      <div class="top-actions">
+        <button class="btn-sm active" id="btnSample" onclick="setMode('merged')">샘플+내 로그 보기</button>
+        <button class="btn-sm" id="btnReal" onclick="setMode('real')">실제 로그만 보기</button>
+        <button class="btn-sm" onclick="exportCSV()">📥 엑셀(CSV) 다운로드</button>
+        <button class="btn-sm" onclick="clearRealLogs()">🗑️ 내 테스트 로그 초기화</button>
+      </div>
+    </div>
+
+    <div id="autoInsight" class="insight-box"></div>
+
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <div class="panel" style="margin-bottom: 14px;">
+      <h2>⏰ 시간대별 조회 분포 (0시 ~ 23시)</h2>
+      <p class="panel-sub">스레드·인스타 예약 발행 시간과 광고 집중 시간대를 잡는 핵심 지표</p>
+      <div class="hour-chart" id="hourChart"></div>
+      <div class="h-labels" id="hourLabels"></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h2>💰 가장 많이 조회한 금액대 (투미카페 기준)</h2>
+        <p class="panel-sub">고객들이 실제로 들고 있는 예산대 → 다음 스레드 매물 선정 기준</p>
+        <div id="budgetBars"></div>
+      </div>
+
+      <div class="panel">
+        <h2>📍 가장 많이 추천·조회된 서울 구역 TOP</h2>
+        <p class="panel-sub">수요가 몰리는 구역 위주로 급매 확보 & 콘텐츠 집중</p>
+        <div id="zoneBars"></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h2>🏠 보유 주택 수 & 실거주 분포</h2>
+        <p class="panel-sub">다주택/갭투자 vs 1주택 갈아타기 콘텐츠 비중 조절용</p>
+        <div id="houseBars"></div>
+      </div>
+
+      <div class="panel">
+        <h2>📣 유입 채널별 트래픽 (어디서 왔나)</h2>
+        <p class="panel-sub">링크 뒤에 ?utm_source=threads / insta / blog 로 구분</p>
+        <div id="sourceBars"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🧾 최근 방문 · 상담 신청 실시간 로그</h2>
+      <p class="panel-sub">전화 클릭이나 콜백 신청을 남긴 진성 고객부터 바로 확인하세요</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>시간</th>
+              <th>유입</th>
+              <th>기기</th>
+              <th>예산대</th>
+              <th>주택/실거주</th>
+              <th>추천 구역</th>
+              <th>전환/연락처</th>
+            </tr>
+          </thead>
+          <tbody id="logTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_PIN = "4474";
+    const LOG_STORAGE_KEY = "tumi_diag_logs_v1";
+    let viewMode = "merged"; // merged | real
+
+    function unlock() {
+      const val = document.getElementById("pinInput").value.trim();
+      if (val === ADMIN_PIN) {
+        document.getElementById("lockWrap").classList.add("hidden");
+        document.getElementById("dashWrap").classList.remove("hidden");
+        renderDashboard();
+      } else {
+        alert("비밀번호가 맞지 않습니다. (기본값: 4474)");
+      }
+    }
+
+    // 대표님이 대시보드 활용도를 바로 보실 수 있는 현실적 샘플 데이터
+    function getSampleLogs() {
+      const sample = [];
+      const hours = [8,8,9,10,12,12,13,15,17,18,18,19,20,20,21,21,21,22,22,22,23];
+      const budgets = ["2억 ~ 5억 미만","5억 ~ 10억 미만","5억 ~ 10억 미만","10억 ~ 15억 미만","5억 ~ 10억 미만","15억 ~ 20억 미만","2억 미만","10억 ~ 15억 미만"];
+      const houses = ["무주택","1주택 (갈아타기)","다주택","1주택 (갈아타기)"];
+      const lives = ["전세 끼고 (실거주 불가)","실거주 가능"];
+      const sources = ["threads","threads","threads","instagram","naver_blog","direct"];
+      const zonesPool = [
+        ["미아2구역 (뚜껑 / 소형)", "사당21구역 · 여의대방신길"],
+        ["마천3구역 · 염리5구역", "북아현2구역 (2호선 아현역)"],
+        ["미아 258번지 (신통기획)", "고덕1구역 · 둔촌동 모아타운"],
+        ["노량진1 · 7구역 (메가 뉴타운)", "성수 전략정비구역 (1~4지구)"]
+      ];
+
+      for (let i = 0; i < 42; i++) {
+        const h = hours[i % hours.length];
+        const b = budgets[i % budgets.length];
+        const house = houses[i % houses.length];
+        const live = lives[i % lives.length];
+        const src = sources[i % sources.length];
+        const z = zonesPool[i % zonesPool.length];
+        const sid = "sample_" + i;
+        const ts = `2026-11-21T${String(h).padStart(2,"0")}:${String((i*7)%60).padStart(2,"0")}:00.000Z`;
+
+        sample.push({ session_id: sid, timestamp: ts, hour: h, source: src, device: i%5===0?"PC":"Mobile", event: "page_view" });
+        if (i % 6 !== 0) {
+          sample.push({ session_id: sid, timestamp: ts, hour: h, source: src, device: i%5===0?"PC":"Mobile", event: "result_view", budget: b, house, live, zones: z });
+        }
+        if (i % 9 === 0) {
+          sample.push({ session_id: sid, timestamp: ts, hour: h, source: src, device: "Mobile", event: "cta_lead", name: "김*수", phone: "010-****-821" + (i%9), budget: b, house, live, zones: z.join(", ") });
+        } else if (i % 7 === 0) {
+          sample.push({ session_id: sid, timestamp: ts, hour: h, source: src, device: "Mobile", event: "cta_call", budget: b, zones: z.join(", ") });
+        }
+      }
+      return sample;
+    }
+
+    function getRealLogs() {
+      try {
+        return JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]");
+      } catch (e) { return []; }
+    }
+
+    function setMode(mode) {
+      viewMode = mode;
+      document.getElementById("btnSample").classList.toggle("active", mode === "merged");
+      document.getElementById("btnReal").classList.toggle("active", mode === "real");
+      renderDashboard();
+    }
+
+    function clearRealLogs() {
+      if (confirm("이 브라우저에 쌓인 내 테스트 로그를 비울까요?")) {
+        localStorage.removeItem(LOG_STORAGE_KEY);
+        renderDashboard();
+      }
+    }
+
+    function countMap(arr) {
+      const m = {};
+      arr.forEach(x => { if (x) m[x] = (m[x] || 0) + 1; });
+      return Object.entries(m).sort((a, b) => b[1] - a[1]);
+    }
+
+    function renderBars(elId, entries, total, colorClass = "") {
+      const el = document.getElementById(elId);
+      if (!entries.length) {
+        el.innerHTML = `<p style="font-size:13px;color:#999;">아직 데이터가 없습니다.</p>`;
+        return;
+      }
+      const max = entries[0][1] || 1;
+      el.innerHTML = entries.slice(0, 6).map(([k, v]) => {
+        const pct = Math.round((v / (total || 1)) * 100);
+        const w = Math.round((v / max) * 100);
+        return `
+          <div class="bar-row">
+            <div class="bar-head"><span>${k}</span><span>${v}건 (${pct}%)</span></div>
+            <div class="bar-track"><div class="bar-fill ${colorClass}" style="width:${w}%"></div></div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderDashboard() {
+      const real = getRealLogs();
+      const logs = viewMode === "real" ? real : [...getSampleLogs(), ...real];
+
+      document.getElementById("dataModeDesc").textContent =
+        viewMode === "real"
+          ? `실제 내 브라우저 로그만 표시 중 (총 ${real.length}개 이벤트)`
+          : `샘플 마케팅 데이터 + 내 브라우저 실제 로그(${real.length}건) 통합 표시 중`;
+
+      const sessions = new Set(logs.map(l => l.session_id));
+      const results = logs.filter(l => l.event === "result_view");
+      const calls = logs.filter(l => l.event === "cta_call");
+      const leads = logs.filter(l => l.event === "cta_lead");
+      const convTotal = calls.length + leads.length;
+      const compRate = sessions.size ? Math.round((results.length / sessions.size) * 100) : 0;
+      const convRate = results.length ? Math.round((convTotal / results.length) * 100) : 0;
+
+      // 시간대 집계
+      const hourCounts = new Array(24).fill(0);
+      logs.filter(l => l.event === "page_view").forEach(l => {
+        if (typeof l.hour === "number") hourCounts[l.hour] += 1;
+      });
+      const maxHourVal = Math.max(...hourCounts, 1);
+      const peakHour = hourCounts.indexOf(Math.max(...hourCounts));
+
+      // 예산 / 구역 / 주택 / 채널
+      const budgetEntries = countMap(results.map(r => r.budget));
+      const zoneEntries = countMap(results.flatMap(r => Array.isArray(r.zones) ? r.zones : []));
+      const houseEntries = countMap(results.map(r => r.house));
+      const sourceEntries = countMap(logs.filter(l => l.event === "page_view").map(l => l.source));
+
+      // 자동 마케팅 인사이트 요약
+      const topBudget = budgetEntries[0] ? budgetEntries[0][0] : "-";
+      const topZone = zoneEntries[0] ? zoneEntries[0][0] : "-";
+      const topSource = sourceEntries[0] ? sourceEntries[0][0] : "-";
+
+      document.getElementById("autoInsight").innerHTML = `
+        <h3>💡 오늘의 자동 마케팅 인사이트</h3>
+        <ul>
+          <li>가장 조회가 많이 터지는 피크 시간은 <b>${peakHour}시 ~ ${peakHour+1}시</b>입니다. (스레드/인스타 링크 노출 최적 타이밍)</li>
+          <li>방문자가 제일 많이 누른 예산대는 <b>${topBudget}</b>, 최다 추천 구역은 <b>${topZone}</b>입니다.</li>
+          <li>현재 트래픽 1위 유입 채널은 <b>${topSource}</b>이며, 진단 완료 대비 전화·상담 전환율은 <b>${convRate}%</b>입니다.</li>
+        </ul>
+      `;
+
+      document.getElementById("kpiGrid").innerHTML = `
+        <div class="kpi"><div class="kpi-label">총 방문자(세션)</div><div class="kpi-val">${sessions.size}명</div><div class="kpi-sub">진단 완료율 ${compRate}%</div></div>
+        <div class="kpi"><div class="kpi-label">진단 결과 조회</div><div class="kpi-val">${results.length}건</div><div class="kpi-sub">피크: ${peakHour}시대</div></div>
+        <div class="kpi"><div class="kpi-label">전화 · 콜백 전환</div><div class="kpi-val">${convTotal}건</div><div class="kpi-sub">전화 ${calls.length} · 신청 ${leads.length} (${convRate}%)</div></div>
+        <div class="kpi"><div class="kpi-label">1위 관심 예산대</div><div class="kpi-val" style="font-size:18px;margin-top:10px;">${topBudget}</div><div class="kpi-sub">매물 공급 1순위</div></div>
+      `;
+
+      // 시간대 차트
+      document.getElementById("hourChart").innerHTML = hourCounts.map((c, idx) => {
+        const hPct = Math.max(4, Math.round((c / maxHourVal) * 100));
+        return `<div class="h-col" title="${idx}시: ${c}건"><div class="h-bar ${idx === peakHour && c > 0 ? 'peak' : ''}" style="height:${hPct}%"></div></div>`;
+      }).join("");
+      document.getElementById("hourLabels").innerHTML = hourCounts.map((_, idx) => `<span>${idx % 3 === 0 ? idx : ""}</span>`).join("");
+
+      renderBars("budgetBars", budgetEntries, results.length);
+      renderBars("zoneBars", zoneEntries, results.length, "dark");
+      renderBars("houseBars", houseEntries, results.length, "green");
+      renderBars("sourceBars", sourceEntries, sessions.size);
+
+      // 세션별 최근 로그 병합
+      const bySess = {};
+      logs.forEach(l => {
+        if (!bySess[l.session_id]) bySess[l.session_id] = { timestamp: l.timestamp, source: l.source, device: l.device, status: "조회만" };
+        const s = bySess[l.session_id];
+        if (l.event === "result_view") {
+          s.budget = l.budget;
+          s.house = l.house;
+          s.live = l.live;
+          s.zones = Array.isArray(l.zones) ? l.zones.join(", ") : l.zones;
+          if (s.status === "조회만") s.status = "결과확인";
+        }
+        if (l.event === "cta_call") s.status = "전화클릭";
+        if (l.event === "cta_lead") {
+          s.status = "상담신청";
+          s.contact = `${l.name} (${l.phone})`;
+        }
+      });
+
+      const rows = Object.values(bySess).sort((a, b) => (b.timestamp || "").localeCompare(a.timestamp || "")).slice(0, 20);
+      document.getElementById("logTableBody").innerHTML = rows.map(r => {
+        const badgeCls = r.status === "상담신청" ? "b-lead" : (r.status === "전화클릭" ? "b-call" : "b-view");
+        const timeStr = (r.timestamp || "").slice(5, 16).replace("T", " ");
+        return `
+          <tr>
+            <td>${timeStr}</td>
+            <td>${r.source || "-"}</td>
+            <td>${r.device || "-"}</td>
+            <td><strong>${r.budget || "-"}</strong></td>
+            <td>${r.house ? `${r.house} / ${r.live === '실거주 가능' ? '실거주' : '갭'}` : "-"}</td>
+            <td>${r.zones || "-"}</td>
+            <td><span class="badge ${badgeCls}">${r.status}</span> ${r.contact ? `<br/><small>${r.contact}</small>` : ""}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function exportCSV() {
+      const real = getRealLogs();
+      const logs = viewMode === "real" ? real : [...getSampleLogs(), ...real];
+      const headers = ["timestamp,hour,source,device,event,budget,house,live,zones,name,phone"];
+      const lines = logs.map(l => [
+        l.timestamp, l.hour, l.source, l.device, l.event,
+        l.budget || "", l.house || "", l.live || "",
+        Array.isArray(l.zones) ? l.zones.join(" | ") : (l.zones || ""),
+        l.name || "", l.phone || ""
+      ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(","));
+
+      const blob = new Blob(["\uFEFF" + headers.concat(lines).join("\n")], { type: "text/csv;charset=utf-8;" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `tumi_marketing_logs_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    }
+  </script>
+</body>
+</html>

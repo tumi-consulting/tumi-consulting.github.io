@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>TUMI | 서울 재개발·재건축 1분 매수 진단기</title>
+  <style>
+    :root {
+      --bg: #FAF8F5;
+      --surface: #FFFFFF;
+      --charcoal: #18181B;
+      --muted: #6B7280;
+      --border: #E7E3DC;
+      --orange: #FF6B00;
+      --orange-soft: #FFF2E8;
+      --danger-bg: #FEF2F2;
+      --danger-border: #FECACA;
+      --danger-text: #991B1B;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
+      background: #EFECE6;
+      color: var(--charcoal);
+      line-height: 1.5;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 460px;
+      min-height: 100vh;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 30px rgba(0,0,0,0.06);
+    }
+
+    .header {
+      padding: 18px 20px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      font-size: 18px;
+      color: var(--charcoal);
+    }
+
+    .logo-badge {
+      background: var(--charcoal);
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+    }
+
+    .header-tag {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--orange);
+      background: var(--orange-soft);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .progress-wrap { padding: 16px 20px 0; }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #E5E0D8;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--orange);
+      border-radius: 999px;
+      transition: width 0.28s ease;
+    }
+
+    .main {
+      padding: 22px 20px 36px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--orange);
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    h1.step-title {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+    }
+
+    .step-desc {
+      margin: 0 0 22px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .grid-1 {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .opt-btn {
+      appearance: none;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 16px 14px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      color: var(--charcoal);
+    }
+
+    .opt-btn:active { transform: scale(0.98); }
+
+    .opt-btn.selected {
+      border-color: var(--orange);
+      background: var(--orange-soft);
+      box-shadow: 0 4px 14px rgba(255, 107, 0, 0.12);
+    }
+
+    .opt-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .opt-sub {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .opt-btn.selected .opt-sub { color: #9A4200; }
+
+    .nav-row {
+      margin-top: auto;
+      padding-top: 24px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-back {
+      padding: 15px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .summary-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .chip {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #ECE7DF;
+      color: var(--charcoal);
+    }
+
+    .chip.accent {
+      background: var(--charcoal);
+      color: #fff;
+    }
+
+    .zone-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+
+    .zone-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .zone-name { font-size: 18px; font-weight: 800; margin: 0; }
+    .zone-area { font-size: 12px; color: var(--muted); font-weight: 600; }
+
+    .zone-stage {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 9px;
+      border-radius: 8px;
+      background: var(--orange-soft);
+      color: var(--orange);
+      white-space: nowrap;
+    }
+
+    .zone-point {
+      font-size: 14px;
+      color: #27272A;
+      margin: 8px 0 10px;
+      line-height: 1.5;
+    }
+
+    .zone-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .z-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      background: #F4F1EC;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .warning-box {
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin: 14px 0 18px;
+      font-size: 13px;
+      color: var(--danger-text);
+      line-height: 1.55;
+    }
+
+    .warning-box strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .cta-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      background: var(--orange);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(255, 107, 0, 0.25);
+    }
+
+    .btn-dark {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 15px;
+      border-radius: 14px;
+      border: none;
+      background: var(--charcoal);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-ghost {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .lead-box {
+      margin-top: 14px;
+      background: var(--surface);
+      border: 1.5px solid var(--charcoal);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .lead-box h3 { margin: 0 0 6px; font-size: 16px; font-weight: 800; }
+    .lead-box p { margin: 0 0 14px; font-size: 12px; color: var(--muted); }
+
+    .input {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 15px;
+      margin-bottom: 10px;
+      background: var(--bg);
+    }
+
+    .lead-done {
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      color: #065F46;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.55;
+      margin-top: 12px;
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      font-size: 11px;
+      color: #8C857B;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="logo">
+        <span class="logo-badge">TUMI</span>
+        <span>매수 진단기</span>
+      </div>
+      <span class="header-tag">1분 무료 체크</span>
+    </header>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-meta">
+        <span id="stepLabel">STEP 1 / 4</span>
+        <span id="stepPercent">25%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 25%"></div>
+      </div>
+    </div>
+
+    <main class="main" id="mainContainer"></main>
+  </div>
+
+  <script>
+    // ==========================================
+    // [투미 마케팅 데이터 수집 엔진]
+    // 실제 배포 시 WEBHOOK_URL에 Google Apps Script / Supabase 주소를 넣으면
+    // 모든 방문자 데이터가 실시간으로 중앙 DB에 저장됩니다.
+    // ==========================================
+    const WEBHOOK_URL = ""; // 예: "https://script.google.com/macros/s/.../exec"
+    const LOG_STORAGE_KEY = "tumi_diag_logs_v1";
+
+    function getUtmSource() {
+      const params = new URLSearchParams(window.location.search);
+      const src = params.get("utm_source") || params.get("src");
+      if (src) return src;
+      const ref = (document.referrer || "").toLowerCase();
+      if (ref.includes("threads")) return "threads";
+      if (ref.includes("instagram")) return "instagram";
+      if (ref.includes("naver")) return "naver_blog";
+      if (ref.includes("youtube")) return "youtube";
+      return "direct";
+    }
+
+    function getDeviceType() {
+      return /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "Mobile" : "PC";
+    }
+
+    const SESSION_ID = "sess_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+    const UTM_SOURCE = getUtmSource();
+    const DEVICE = getDeviceType();
+
+    function trackEvent(eventType, payload = {}) {
+      const now = new Date();
+      const record = {
+        session_id: SESSION_ID,
+        timestamp: now.toISOString(),
+        hour: now.getHours(),
+        date: now.toISOString().slice(0, 10),
+        source: UTM_SOURCE,
+        device: DEVICE,
+        event: eventType,
+        ...payload
+      };
+
+      // 로컬 저장 (관리자 페이지 즉시 연동용)
+      try {
+        const existing = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]");
+        existing.push(record);
+        localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(existing.slice(-2000)));
+      } catch (e) {}
+
+      // 중앙 DB 웹훅 전송 (설정 시)
+      if (WEBHOOK_URL) {
+        fetch(WEBHOOK_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(record)
+        }).catch(() => {});
+      }
+    }
+
+    // 페이지 진입 기록
+    trackEvent("page_view");
+
+    // 투미카페 '투자금액별 추천물건' 8개 공식 구간 반영
+    const BUDGET_OPTIONS = [
+      { id: "under2", label: "2억 미만", sub: "초소액 신통·모아타운" },
+      { id: "2to5",   label: "2억 ~ 5억 미만", sub: "소액 재개발·뚜껑·모아" },
+      { id: "5to10",  label: "5억 ~ 10억 미만", sub: "서울 핵심 중소형 진입" },
+      { id: "10to15", label: "10억 ~ 15억 미만", sub: "메이저 뉴타운·역세권" },
+      { id: "15to20", label: "15억 ~ 20억 미만", sub: "한강변·서부선·대장 84" },
+      { id: "20to30", label: "20억 ~ 30억 미만", sub: "성수·한남·목동 핵심" },
+      { id: "30to40", label: "30억 ~ 40억 미만", sub: "한남·성수 대형 급매" },
+      { id: "over40", label: "40억 이상", sub: "압구정·한남 하이엔드" }
+    ];
+
+    const HOUSE_OPTIONS = [
+      { id: "0", label: "무주택", sub: "생애최초·실거주·대출 여력 유리" },
+      { id: "1", label: "1주택 (갈아타기)", sub: "일시적 2주택·입주권 승계 체크 필요" },
+      { id: "2", label: "다주택", sub: "지위 양도 제한·취득세·세금 전략 필수" }
+    ];
+
+    const LIVE_OPTIONS = [
+      { id: "yes", label: "실거주 가능", sub: "토허제 아파트·이주 후 입주 등 모두 대응" },
+      { id: "no",  label: "전세 끼고 (실거주 불가)", sub: "빌라·다세대 등 갭투자 중심 추천" }
+    ];
+
+    const SPEED_OPTIONS = [
+      { id: "fast", label: "빠른 입주 (관리처분 ~ 이주)", sub: "사업 불확실성 적고 신축 입주 빠른 구역" },
+      { id: "mid",  label: "중기 핵심 (조합 ~ 사업시행)", sub: "시세차익과 속도의 균형이 좋은 구역" },
+      { id: "early",label: "초기 소액 (신통 · 모아타운)", sub: "적은 투자금으로 길게 보는 구역" },
+      { id: "any",  label: "상관없음 (가성비·저평가 우선)", sub: "조건 안에서 지금 가장 싼 구역 추천" }
+    ];
+
+    const ZONES = [
+      {
+        name: "미아 258번지 (신통기획)",
+        area: "강북구",
+        stage: "조합설립인가",
+        budgets: ["under2", "2to5"],
+        speed: ["early", "mid", "any"],
+        liveNoOk: true,
+        multiOk: true,
+        point: "추진위 10개월 만에 조합설립인가까지 뚫은 초스피드 초기 구역. 2억 미만~2억대 소액으로 서울 신축 입주권 노리기 좋습니다.",
+        tags: ["초투 1.8억~", "다주택·갭 가능", "빠른 사업 속도"]
+      },
+      {
+        name: "고덕1구역 · 둔촌동 모아타운",
+        area: "강동구",
+        stage: "추진위 / 조합설립",
+        budgets: ["under2", "2to5"],
+        speed: ["early", "any"],
+        liveNoOk: true,
+        multiOk: true,
+        point: "9호선 연장·강동 생활권 수혜지. 모아타운 편입 물건이나 소형 세대 위주로 2억~4억대 접근이 가능합니다.",
+        tags: ["9호선 호재", "소액 진입", "모아/신통"]
+      },
+      {
+        name: "미아2구역 (뚜껑 / 소형)",
+        area: "강북구",
+        stage: "사업시행인가 준비",
+        budgets: ["2to5", "5to10"],
+        speed: ["mid", "any"],
+        liveNoOk: true,
+        multiOk: true,
+        point: "동북권 대장 4,000세대급 뉴타운. 4억대 뚜껑(단독)부터 6~8억대 다세대까지 예산별 선택지가 가장 넓습니다.",
+        tags: ["동북권 대장", "4,000세대급", "월세 수익 병행"]
+      },
+      {
+        name: "사당21구역 · 여의대방신길",
+        area: "동작·영등포구",
+        stage: "신통 / 역세권",
+        budgets: ["2to5", "5to10"],
+        speed: ["early", "mid", "any"],
+        liveNoOk: true,
+        multiOk: true,
+        point: "여의도·강남 직주근접 5억 전후 알짜 라인. 가용 현금 5억 안팎에서 서남권 신축을 노릴 때 가장 먼저 봅니다.",
+        tags: ["직주근접", "초투 5억 전후", "다주택·갭 가능"]
+      },
+      {
+        name: "중곡동 D2 · 영등포1-11구역",
+        area: "광진·영등포구",
+        stage: "추진 / 촉진구역",
+        budgets: ["5to10"],
+        speed: ["mid", "early", "any"],
+        liveNoOk: true,
+        multiOk: true,
+        point: "한강·도심 접근성 대비 저평가된 7~8억대 라인. 신축 다세대·촉진구역 위주로 분담금 방어가 유리합니다.",
+        tags: ["초투 7~8억대", "도심·한강 인접", "분담금 방어"]
+      },
+      {
+        name: "마천3구역 · 염리5구역",
+        area: "송파·마포구",
+        stage: "사업시행 ~ 관리처분",
+        budgets: ["5to10", "10to15"],
+        speed: ["fast", "mid", "any"],
+        liveNoOk: true,
+        multiOk: true,
+        point: "송파 위례선·마포 뉴타운 완성 퍼즐. 9~11억대 초반 급매가 간혹 나오며 실거주·투자 균형이 뛰어납니다.",
+        tags: ["송파·마포 핵심", "초투 9~12억대", "대단지 브랜드"]
+      },
+      {
+        name: "북아현2구역 (2호선 아현역)",
+        area: "서대문구",
+        stage: "이주 돌입 (관리처분 후)",
+        budgets: ["10to15", "15to20"],
+        speed: ["fast", "any"],
+        liveNoOk: true,
+        multiOk: false,
+        point: "삼성물산·DL이앤씨 2,320세대 평지 더블역세권. 2026년 11월 이주 시작으로 13억대 최저 P 매물 선점 타이밍입니다.",
+        tags: ["이주 시작", "1군 컨소시엄", "단, 1주택·예외요건 체크"]
+      },
+      {
+        name: "노량진1 · 7구역 (메가 뉴타운)",
+        area: "동작구",
+        stage: "관리처분 ~ 이주·철거",
+        budgets: ["15to20", "20to30"],
+        speed: ["fast", "mid", "any"],
+        liveNoOk: true,
+        multiOk: false,
+        point: "한강 인접 서부권 대장 84타입 라인. 속도가 가장 빠르고 17~19억대 진입 시 신축 시세차익이 확실합니다.",
+        tags: ["한강 생활권", "84타입", "속도 최상"]
+      },
+      {
+        name: "성수 전략정비구역 (1~4지구)",
+        area: "성동구",
+        stage: "시공사 선정 / 사업시행",
+        budgets: ["15to20", "20to30", "30to40"],
+        speed: ["mid", "any"],
+        liveNoOk: true,
+        multiOk: true,
+        point: "초고층 한강변 대한민국 랜드마크. 연립·다가구·올근생 등 물건 성격에 따라 10억대 후반~30억대까지 진입 가능합니다.",
+        tags: ["초고층 한강변", "시공사 선정", "하이엔드"]
+      },
+      {
+        name: "한남뉴타운 (한남4 · 5구역)",
+        area: "용산구",
+        stage: "사업시행 / 관리처분",
+        budgets: ["15to20", "20to30", "30to40", "over40"],
+        speed: ["mid", "fast", "any"],
+        liveNoOk: true,
+        multiOk: true,
+        point: "국내 최고가 주거벨트. 15억대 소형 다세대부터 30억 이상 원빌라·상가까지 자산 규모별 최적 매물이 존재합니다.",
+        tags: ["용산 한강변", "하이엔드 정점", "자산가 선호"]
+      },
+      {
+        name: "목동 재건축 · 압구정 재건축",
+        area: "양천·강남구",
+        stage: "정비구역 / 조합",
+        budgets: ["20to30", "30to40", "over40"],
+        speed: ["mid", "early", "any"],
+        liveNoOk: false,
+        multiOk: true,
+        point: "토지거래허가구역 아파트로 실거주 2년 요건 충족 시 압도적 상급지 갈아타기 대안입니다.",
+        tags: ["토허제 실거주 필수", "학군·한강 대장", "아파트 재건축"]
+      }
+    ];
+
+    const state = { step: 1, budget: null, house: null, live: null, speed: null };
+
+    const mainEl = document.getElementById("mainContainer");
+    const progressWrap = document.getElementById("progressWrap");
+    const stepLabel = document.getElementById("stepLabel");
+    const stepPercent = document.getElementById("stepPercent");
+    const progressFill = document.getElementById("progressFill");
+
+    function updateProgress() {
+      if (state.step > 4) {
+        progressWrap.classList.add("hidden");
+        return;
+      }
+      progressWrap.classList.remove("hidden");
+      const pct = state.step * 25;
+      stepLabel.textContent = `STEP ${state.step} / 4`;
+      stepPercent.textContent = `${pct}%`;
+      progressFill.style.width = `${pct}%`;
+    }
+
+    function render() {
+      updateProgress();
+      if (state.step === 1) renderStep1();
+      else if (state.step === 2) renderStep2();
+      else if (state.step === 3) renderStep3();
+      else if (state.step === 4) renderStep4();
+      else renderResult();
+    }
+
+    function renderStep1() {
+      mainEl.innerHTML = `
+        <div class="eyebrow">Q1. 가용 자금</div>
+        <h1 class="step-title">현재 투입 가능한<br/>초기투자금은 얼마인가요?</h1>
+        <p class="step-desc">투미카페 실제 매물 금액대 기준으로 딱 맞는 구역을 추려드려요.</p>
+        <div class="grid-2">
+          ${BUDGET_OPTIONS.map(o => `
+            <button class="opt-btn ${state.budget === o.id ? 'selected' : ''}" onclick="selectOpt('budget', '${o.id}', '${o.label}')">
+              <span class="opt-title">${o.label}</span>
+              <span class="opt-sub">${o.sub}</span>
+            </button>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderStep2() {
+      mainEl.innerHTML = `
+        <div class="eyebrow">Q2. 주택 수</div>
+        <h1 class="step-title">현재 보유 중인<br/>주택 수를 선택해 주세요</h1>
+        <p class="step-desc">조합원 지위 양도 제한과 세금·대출 가능 구역이 달라집니다.</p>
+        <div class="grid-1">
+          ${HOUSE_OPTIONS.map(o => `
+            <button class="opt-btn ${state.house === o.id ? 'selected' : ''}" onclick="selectOpt('house', '${o.id}', '${o.label}')">
+              <span class="opt-title">${o.label}</span>
+              <span class="opt-sub">${o.sub}</span>
+            </button>
+          `).join("")}
+        </div>
+        <div class="nav-row"><button class="btn-back" onclick="goBack()">← 이전</button></div>
+      `;
+    }
+
+    function renderStep3() {
+      mainEl.innerHTML = `
+        <div class="eyebrow">Q3. 실거주 여부</div>
+        <h1 class="step-title">매수 후 직접<br/>실거주가 가능하신가요?</h1>
+        <p class="step-desc">토지거래허가구역 아파트(재건축) 포함 여부를 결정합니다.</p>
+        <div class="grid-1">
+          ${LIVE_OPTIONS.map(o => `
+            <button class="opt-btn ${state.live === o.id ? 'selected' : ''}" onclick="selectOpt('live', '${o.id}', '${o.label}')">
+              <span class="opt-title">${o.label}</span>
+              <span class="opt-sub">${o.sub}</span>
+            </button>
+          `).join("")}
+        </div>
+        <div class="nav-row"><button class="btn-back" onclick="goBack()">← 이전</button></div>
+      `;
+    }
+
+    function renderStep4() {
+      mainEl.innerHTML = `
+        <div class="eyebrow">Q4. 선호 사업 속도</div>
+        <h1 class="step-title">어떤 속도의 구역을<br/>가장 선호하시나요?</h1>
+        <p class="step-desc">마지막 질문이에요! 바로 추천 구역 결과를 보여드릴게요.</p>
+        <div class="grid-1">
+          ${SPEED_OPTIONS.map(o => `
+            <button class="opt-btn ${state.speed === o.id ? 'selected' : ''}" onclick="selectOpt('speed', '${o.id}', '${o.label}')">
+              <span class="opt-title">${o.label}</span>
+              <span class="opt-sub">${o.sub}</span>
+            </button>
+          `).join("")}
+        </div>
+        <div class="nav-row"><button class="btn-back" onclick="goBack()">← 이전</button></div>
+      `;
+    }
+
+    window.selectOpt = function(key, val, label) {
+      state[key] = val;
+      trackEvent("select_" + key, { value: val, label: label });
+      state.step += 1;
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    window.goBack = function() {
+      if (state.step > 1) {
+        state.step -= 1;
+        render();
+      }
+    };
+
+    function getMatchedZones() {
+      let list = ZONES.filter(z => z.budgets.includes(state.budget));
+      if (state.live === "no") list = list.filter(z => z.liveNoOk);
+      if (state.house === "2") list.sort((a, b) => (b.multiOk ? 1 : 0) - (a.multiOk ? 1 : 0));
+      if (state.speed !== "any") {
+        list.sort((a, b) => (b.speed.includes(state.speed) ? 1 : 0) - (a.speed.includes(state.speed) ? 1 : 0));
+      }
+      return list.slice(0, 3);
+    }
+
+    function renderResult() {
+      const budgetLabel = BUDGET_OPTIONS.find(o => o.id === state.budget).label;
+      const houseLabel = HOUSE_OPTIONS.find(o => o.id === state.house).label;
+      const liveLabel = LIVE_OPTIONS.find(o => o.id === state.live).label;
+      const speedLabel = SPEED_OPTIONS.find(o => o.id === state.speed).label.split(" (")[0];
+
+      const matched = getMatchedZones();
+      const matchedNames = matched.map(m => m.name);
+
+      trackEvent("result_view", {
+        budget: budgetLabel,
+        house: houseLabel,
+        live: liveLabel,
+        speed: speedLabel,
+        zones: matchedNames
+      });
+
+      mainEl.innerHTML = `
+        <div class="eyebrow">진단 완료</div>
+        <h1 class="step-title">대표님 조건에 맞는<br/>서울 핵심 추천 구역이에요</h1>
+
+        <div class="summary-chips">
+          <span class="chip accent">${budgetLabel}</span>
+          <span class="chip">${houseLabel}</span>
+          <span class="chip">${liveLabel}</span>
+          <span class="chip">${speedLabel}</span>
+        </div>
+
+        ${matched.map(z => `
+          <div class="zone-card">
+            <div class="zone-top">
+              <div>
+                <div class="zone-area">${z.area}</div>
+                <h2 class="zone-name">${z.name}</h2>
+              </div>
+              <span class="zone-stage">${z.stage}</span>
+            </div>
+            <p class="zone-point">${z.point}</p>
+            <div class="zone-tags">
+              ${z.tags.map(t => `<span class="z-tag">#${t}</span>`).join("")}
+            </div>
+          </div>
+        `).join("")}
+
+        <div class="warning-box">
+          <strong>⚠️ 매수 전 반드시 확인하세요</strong>
+          같은 구역 안에서도 지번·권리산정기준일·조합원 지위 승계 여부에 따라 <b>입주권 유무(물딱지)와 최저가가 완전히 다릅니다.</b><br/>
+          실제 급매 소진 여부에 따라 초기투자금은 수시로 변동됩니다.
+        </div>
+
+        <div class="cta-stack">
+          <a href="tel:02-2294-7777" class="btn-primary" onclick="trackEvent('cta_call', { budget: '${budgetLabel}', zones: '${matchedNames.join(', ')}' })">
+            📞 02-2294-7777 바로 전화 상담
+          </a>
+          <button class="btn-dark" onclick="toggleLeadForm()">
+            📩 내 조건 그대로 급매·물딱지 체크 신청
+          </button>
+          <button class="btn-ghost" onclick="resetQuiz()">
+            ↺ 조건 바꿔서 다시 진단하기
+          </button>
+        </div>
+
+        <div id="leadBox" class="lead-box hidden">
+          <h3>담당자 직통 콜백 신청</h3>
+          <p>방금 선택하신 4가지 조건과 추천 구역이 투미 담당자에게 그대로 전달됩니다.</p>
+          <input type="text" id="leadName" class="input" placeholder="성함 (예: 홍길동)" />
+          <input type="tel" id="leadPhone" class="input" placeholder="연락처 (예: 010-1234-5678)" />
+          <button class="btn-primary" onclick="submitLead('${budgetLabel}', '${houseLabel}', '${liveLabel}', '${matchedNames.join(', ')}')">
+            무료 매물·권리분석 신청 완료
+          </button>
+        </div>
+
+        <div id="leadDone" class="lead-done hidden"></div>
+
+        <div class="footer-note">
+          투미재개발부동산중개법인(주) · 서울 전지역 재개발·재건축 전문<br/>
+          본 진단 결과는 참고용이며, 개별 매물의 권리관계는 반드시 전문가 확인이 필요합니다.
+        </div>
+      `;
+    }
+
+    window.toggleLeadForm = function() {
+      const box = document.getElementById("leadBox");
+      box.classList.toggle("hidden");
+      if (!box.classList.contains("hidden")) {
+        box.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    };
+
+    window.submitLead = function(b, h, l, zones) {
+      const name = document.getElementById("leadName").value.trim();
+      const phone = document.getElementById("leadPhone").value.trim();
+      if (!name || !phone) {
+        alert("성함과 연락처를 입력해 주세요.");
+        return;
+      }
+      trackEvent("cta_lead", { name, phone, budget: b, house: h, live: l, zones });
+      document.getElementById("leadBox").classList.add("hidden");
+      const done = document.getElementById("leadDone");
+      done.classList.remove("hidden");
+      done.innerHTML = `
+        <strong>✅ 신청이 접수되었습니다!</strong><br/><br/>
+        • 신청자: ${name} (${phone})<br/>
+        • 조건: ${b} / ${h} / ${l}<br/>
+        • 추천 구역: ${zones}<br/><br/>
+        담당자가 확인 후 빠르게 연락드리겠습니다.
+      `;
+    };
+
+    window.resetQuiz = function() {
+      state.step = 1;
+      state.budget = null;
+      state.house = null;
+      state.live = null;
+      state.speed = null;
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    render();
+  </script>
+</body>
+</html>
