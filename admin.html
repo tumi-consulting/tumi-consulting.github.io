@@ -264,6 +264,7 @@
       <div class="top-actions">
         <button class="btn-sm active" id="btnSample" onclick="setMode('merged')">샘플+내 로그 보기</button>
         <button class="btn-sm" id="btnReal" onclick="setMode('real')">실제 로그만 보기</button>
+        <button class="btn-sm" onclick="refreshRemote()">🔄 중앙 로그 새로고침</button>
         <button class="btn-sm" onclick="exportCSV()">📥 엑셀(CSV) 다운로드</button>
         <button class="btn-sm" onclick="clearRealLogs()">🗑️ 내 테스트 로그 초기화</button>
       </div>
@@ -333,7 +334,11 @@
   <script>
     const ADMIN_PIN = "4474";
     const LOG_STORAGE_KEY = "tumi_diag_logs_v1";
+    // 진단기와 동일한 Google Apps Script 웹앱 주소. 비어 있으면 이 브라우저 로그만 사용합니다.
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxG18KEo91B99Zt8MP-zMbdKr6M5i751d5BQNwNhwM62ovhdzmzr3yp7y-M4Lq2FoMoQw/exec";
     let viewMode = "merged"; // merged | real
+    let remoteLogs = [];
+    let remoteStatus = "";
 
     function unlock() {
       const val = document.getElementById("pinInput").value.trim();
@@ -341,9 +346,69 @@
         document.getElementById("lockWrap").classList.add("hidden");
         document.getElementById("dashWrap").classList.remove("hidden");
         renderDashboard();
+        loadRemoteLogs().then(renderDashboard);
       } else {
         alert("비밀번호가 맞지 않습니다. (기본값: 4474)");
       }
+    }
+
+    // ---- 중앙 서버(Apps Script) 로그 불러오기 ----
+    function urlWith(url, extra) {
+      return url + (url.indexOf("?") >= 0 ? "&" : "?") + extra;
+    }
+
+    function loadRemoteLogsJsonp() {
+      return new Promise(function (resolve, reject) {
+        const cb = "tumiCb_" + Date.now();
+        window[cb] = function (data) {
+          remoteLogs = (data && data.logs) || [];
+          try { delete window[cb]; } catch (e) { window[cb] = null; }
+          resolve(remoteLogs);
+        };
+        const s = document.createElement("script");
+        s.src = urlWith(WEBHOOK_URL, "callback=" + cb + "&t=" + Date.now());
+        s.onerror = function () { try { delete window[cb]; } catch (e) {} reject(new Error("jsonp_failed")); };
+        document.body.appendChild(s);
+        setTimeout(function () { reject(new Error("jsonp_timeout")); }, 8000);
+      });
+    }
+
+    async function loadRemoteLogs() {
+      if (!WEBHOOK_URL) { remoteStatus = "중앙 서버 미연결(WEBHOOK_URL 비어 있음)"; return remoteLogs; }
+      try {
+        const res = await fetch(urlWith(WEBHOOK_URL, "t=" + Date.now()), { cache: "no-store" });
+        const data = await res.json();
+        remoteLogs = (data && data.logs) || (Array.isArray(data) ? data : []);
+        remoteStatus = "중앙 로그 " + remoteLogs.length + "건 연결됨";
+      } catch (e) {
+        try {
+          await loadRemoteLogsJsonp();
+          remoteStatus = "중앙 로그 " + remoteLogs.length + "건 연결됨(JSONP)";
+        } catch (e2) {
+          remoteStatus = "중앙 로그 불러오기 실패 — 이 브라우저 로그만 표시";
+        }
+      }
+      return remoteLogs;
+    }
+
+    function refreshRemote() {
+      if (!WEBHOOK_URL) { alert("아직 중앙 서버 주소가 설정되지 않았습니다."); return; }
+      loadRemoteLogs().then(function () { renderDashboard(); });
+    }
+
+    // 중앙 로그 + 이 브라우저 로그를 중복 없이 합칩니다.
+    function getAllLogs() {
+      const local = getRealLogs();
+      if (!remoteLogs.length) return local;
+      const seen = {};
+      const merged = [];
+      remoteLogs.concat(local).forEach(function (l) {
+        const k = (l.timestamp || "") + "|" + (l.session_id || "") + "|" + (l.event || "");
+        if (seen[k]) return;
+        seen[k] = 1;
+        merged.push(l);
+      });
+      return merged;
     }
 
     // 대표님이 대시보드 활용도를 바로 보실 수 있는 현실적 샘플 데이터
@@ -398,7 +463,7 @@
     }
 
     function clearRealLogs() {
-      if (confirm("이 브라우저에 쌓인 내 테스트 로그를 비울까요?")) {
+      if (confirm("이 브라우저에 쌓인 로그를 비울까요? (중앙 서버 로그는 그대로 유지됩니다)")) {
         localStorage.removeItem(LOG_STORAGE_KEY);
         renderDashboard();
       }
@@ -430,13 +495,14 @@
     }
 
     function renderDashboard() {
-      const real = getRealLogs();
+      const real = getAllLogs();
       const logs = viewMode === "real" ? real : [...getSampleLogs(), ...real];
 
+      const statusTxt = remoteStatus ? ` · ${remoteStatus}` : "";
       document.getElementById("dataModeDesc").textContent =
         viewMode === "real"
-          ? `실제 내 브라우저 로그만 표시 중 (총 ${real.length}개 이벤트)`
-          : `샘플 마케팅 데이터 + 내 브라우저 실제 로그(${real.length}건) 통합 표시 중`;
+          ? `중앙 서버 + 실제 로그만 표시 중 (총 ${real.length}개 이벤트)${statusTxt}`
+          : `샘플 마케팅 데이터 + 실제 로그(${real.length}건) 통합 표시 중${statusTxt}`;
 
       const sessions = new Set(logs.map(l => l.session_id));
       const results = logs.filter(l => l.event === "result_view");
@@ -531,7 +597,7 @@
     }
 
     function exportCSV() {
-      const real = getRealLogs();
+      const real = getAllLogs();
       const logs = viewMode === "real" ? real : [...getSampleLogs(), ...real];
       const headers = ["timestamp,hour,source,device,event,budget,house,live,zones,name,phone"];
       const lines = logs.map(l => [
