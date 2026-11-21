@@ -294,6 +294,67 @@
     }
     .zone-call-btn:active { transform: scale(0.98); }
 
+    .zone-actions {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .zone-call-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1.5px solid #FFD8BF;
+      background: var(--orange-soft);
+      color: var(--orange);
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .zone-call-btn:active {
+      background: #FFE5D1;
+    }
+
+    .zone-map-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--charcoal);
+      font-size: 12.5px;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .more-zones-box {
+      background: var(--surface);
+      border: 1.5px dashed #D6CFC4;
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin: 12px 0;
+      font-size: 13px;
+      color: var(--charcoal);
+      line-height: 1.55;
+    }
+
+    .more-zones-box strong {
+      display: block;
+      font-size: 14px;
+      color: var(--orange);
+      margin-bottom: 4px;
+    }
+
     .warning-box {
       background: var(--danger-bg);
       border: 1px solid var(--danger-border);
@@ -411,7 +472,7 @@
     <header class="header">
       <div class="logo">
         <span class="logo-badge">TUMI</span>
-        <span>매수 진단기</span>
+        <span>서울 재개발·재건축 진단기</span>
       </div>
       <span class="header-tag">1분 무료 체크</span>
     </header>
@@ -787,6 +848,21 @@
       return list.slice(0, 3);
     }
 
+    function getNextBudgetZones(excludeNames) {
+      const idx = BUDGET_OPTIONS.findIndex(o => o.id === state.budget);
+      const nextIds = [];
+      if (idx + 1 < BUDGET_OPTIONS.length) nextIds.push(BUDGET_OPTIONS[idx + 1].id);
+      if (idx - 1 >= 0) nextIds.push(BUDGET_OPTIONS[idx - 1].id);
+      let list = ZONES.filter(z => z.budgets.some(b => nextIds.includes(b)) && !excludeNames.includes(z.name));
+      if (state.live === "no") list = list.filter(z => z.liveNoOk);
+      return list;
+    }
+
+    function getNaverMapUrl(z) {
+      const cleanName = z.name.split("(")[0].split("·")[0].trim();
+      return "https://map.naver.com/p/search/" + encodeURIComponent(z.area + " " + cleanName);
+    }
+
     function renderResult() {
       const budgetLabel = BUDGET_OPTIONS.find(o => o.id === state.budget).label;
       const houseLabel = HOUSE_OPTIONS.find(o => o.id === state.house).label;
@@ -795,6 +871,9 @@
 
       const matched = getMatchedZones();
       const matchedNames = matched.map(m => m.name);
+      const moreZones = getNextBudgetZones(matchedNames);
+      const moreCount = Math.max(moreZones.length, 3);
+      const morePreview = moreZones.slice(0, 2).map(z => z.name.split(" (")[0]).join(", ");
 
       trackEvent("result_view", {
         budget: budgetLabel,
@@ -828,11 +907,22 @@
             <div class="zone-tags">
               ${z.tags.map(t => `<span class="z-tag">#${t}</span>`).join("")}
             </div>
-            <a href="tel:${z.phone}" class="zone-call-btn" onclick="trackEvent('cta_call', { budget: '${budgetLabel}', zones: '${z.name}', phone: '${z.phone}' })">
-              📞 ${z.phoneLabel}
-            </a>
+            <div class="zone-actions">
+              <a href="tel:${z.phone}" class="zone-call-btn" onclick="trackEvent('cta_call', { budget: '${budgetLabel}', zones: '${z.name}', phone: '${z.phone}' })">
+                📞 ${z.phoneLabel}
+              </a>
+              <a href="${getNaverMapUrl(z)}" target="_blank" rel="noopener" class="zone-map-btn" onclick="trackEvent('map_click', { zones: '${z.name}' })">
+                📍 지도 보기
+              </a>
+            </div>
           </div>
         `).join("")}
+
+        <div class="more-zones-box">
+          <strong>➕ 조건을 조금만 넓히시면 유사 구역 ${moreCount}곳이 더 있어요!</strong>
+          ${morePreview ? `자금·조건을 살짝 조정하시면 <b>${morePreview}</b> 외 <b>비공개 급매</b>까지 선택지가 훨씬 넓어집니다.` : `선택하신 예산 전후로 <b>비공개 급매·인접 구역</b>이 더 준비되어 있습니다.`}<br/>
+          아래 전화·상담 신청으로 정확한 매물 리스트를 받아보세요.
+        </div>
 
         <div class="warning-box">
           <strong>⚠️ 매수 전 반드시 확인하세요</strong>
