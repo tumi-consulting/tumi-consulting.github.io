@@ -570,6 +570,7 @@
     const HOUSE_OPTIONS = [
       { id: "0", label: "무주택", sub: "생애최초·실거주·대출 여력 유리" },
       { id: "1", label: "1주택 (갈아타기)", sub: "일시적 2주택·입주권 승계 체크 필요" },
+      { id: "1_add", label: "1주택 (추가매수)", sub: "기존 주택 보유·2주택 세금/규제 전략" },
       { id: "2", label: "다주택", sub: "지위 양도 제한·취득세·세금 전략 필수" }
     ];
 
@@ -854,7 +855,7 @@
     function getMatchedZones() {
       let list = ZONES.filter(z => z.budgets.includes(state.budget));
       if (state.live === "no") list = list.filter(z => z.liveNoOk);
-      if (state.house === "2") list.sort((a, b) => (b.multiOk ? 1 : 0) - (a.multiOk ? 1 : 0));
+      if (state.house === "2" || state.house === "1_add") list.sort((a, b) => (b.multiOk ? 1 : 0) - (a.multiOk ? 1 : 0));
       if (state.speed !== "any") {
         list.sort((a, b) => (b.speed.includes(state.speed) ? 1 : 0) - (a.speed.includes(state.speed) ? 1 : 0));
       }
